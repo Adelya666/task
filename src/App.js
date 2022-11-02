@@ -1,25 +1,33 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import { useEffect } from "react";
+import Container from "@mui/material/Container";
+import Private from "./routing/Private/Private";
+import Public from "./routing/Public/Public";
+import { connect } from "react-redux";
+import * as authActions from "./actions/auth";
 
-function App() {
+const App = (props) => {
+  useEffect(() => {
+    if (!props.isAuthenticated) {
+      props.autoSignup();
+    }
+  }, [props]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Container>{props.isAuthenticated ? <Private /> : <Public />}</Container>
   );
-}
+};
 
-export default App;
+const mapStateToProps = (state) => {
+  return {
+    isAuthenticated: state.auth.token !== null,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    autoSignup: () => dispatch(authActions.authCheckState()),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
